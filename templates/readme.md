@@ -50,31 +50,36 @@ docker compose down
 
 4. Authenticate Docker to the created ACR:
    ```
-   az acr login --name dockerhosexyz
+   az acr login --name $acr
    ```
 
 5. Tag local docker images to your ACR:
+   Confirm availability of all microservices docker images
+   [image]
+   
+   Obtain ACR registry url. This command assumes that you only have ACR or the acr targeted is first in the display 
    ```
-   acrdomain=$(az acr list --resource-group dockerTest --query "[].{acrLoginServer:loginServer}" --output table | awk 'NR==3{print $1}')
+   acrdomain=$(az acr list --resource-group $rg --query "[].{acrLoginServer:loginServer}" --output table | awk 'NR==3{print $1}')
    docker tag <localimagename> $acrdomain/<localimagename>:<versioning>
    ```
 
-6. Confirm tagged images:
+7. Confirm tagged images:
    ```
    docker images
    ```
+   [images]
 
-7. Push images to the Azure repository:
+8. Push images to the Azure repository:
    ```
    docker push $acrdomain/<localimagename>:<versioning>
    ```
 
-8. Verify pushed images:
+9. Verify pushed images:
    ```
    az acr repository list --name $acr --output table
    ```
 
-## Create and Deploy Azure Kubernetes Cluster (AKS)
+## 2.  Create and Deploy Azure Kubernetes Cluster (AKS)
 
 1. Install kubectl to AZ CLI:
    ```
