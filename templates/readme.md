@@ -1,31 +1,45 @@
 
 
 # Deploying Microservices into Azure AKS
+## Prerequisites
+- AZ CLI version ^2.0.53
+- [Kubernetes CLI](#install-kubectl)
+- Docker
+- [Helm](https://helm.sh)
 
-**Source:** [Azure AKS Tutorial](https://learn.microsoft.com/en-us/azure/aks/tutorial-kubernetes-prepare-app)
+## Assumptions
+This deployment was made over the following assumptions
+- Active Azure subscription
+- AZ CLI version ^2.48.1
+- Docker installed on WSL
+- A bash terminal is used
+- Won't exit bash session until complete
+- 2 Dotnet applications (microservices) in one solution. And their docker files prepared
+**Main Reference:** [Source](https://learn.microsoft.com/en-us/azure/aks/tutorial-kubernetes-prepare-app)
 
-## Build and Configure Images Using Docker Compose
+## 1. Build and Configure Images Using Docker Compose
+Start docker desktop
+Open terminal in the `main` folder. alternative cd to the terminal
+Test microservices locally by deploying them in docker
+```
+docker compose up
+```
+*The process may take several minutes in the first time of deployment*
 
- - Test images locally using Docker Compose:
-
-  docker compose up
-  ```
-- Clean up resources:
-  ```
-  docker compose down
-  ```
+Clean up resources. Ready for AKS deployment
+```
+docker compose down
+```
 
 ## AKS Deployment Using Bash AZ CLI
-
-1. Create a resource group:
+1. Authenticate AZ CLI:
+   ```
+   az account --use-device-code
+   ```
+2. Create a resource group:
    ```
    rg=ResourceName
    az group create --name $rg --location eastus
-   ```
-
-2. Authenticate AZ CLI:
-   ```
-   az account --use-device-code
    ```
 
 3. Create an Azure Container Registry (ACR):
