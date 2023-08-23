@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  test-reporting:
+    image: test-reporting
+    container_name: test-reporting
+    build:
+      context: ./
+      dockerfile: ./Report/Saas.Reporting/Dockerfile
+
+    expose:
+      - "80"
+    ports:
+      - "8080:80"
+
+  test1:
+    image: docker-test1
+    container_name: docker-test1
+    build:
+      context: ./
+      dockerfile: ./Test1/Dockerfile
+
+    expose:
+      - "80"
+    ports:
+      - "8082:80"
+
+  test2:
+    image: docker-test2
+    container_name: docker-test2
+    build:
+      context: ./
+      dockerfile: ./Test2/Dockerfile
+
+    expose:
+      - "80"
+    ports:
+      - "8083:80"  
