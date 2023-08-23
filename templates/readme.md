@@ -1,14 +1,13 @@
-Sure, I can help you convert the provided text into a proper Markdown file. Here's the formatted text in Markdown:
 
-```markdown
-# Azure AKS Tutorial
+
+# Deploying Microservices into Azure AKS
 
 **Source:** [Azure AKS Tutorial](https://learn.microsoft.com/en-us/azure/aks/tutorial-kubernetes-prepare-app)
 
 ## Build and Configure Images Using Docker Compose
 
-- Test images locally using Docker Compose:
-  ```
+ - Test images locally using Docker Compose:
+
   docker compose up
   ```
 - Clean up resources:
