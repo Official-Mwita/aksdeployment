@@ -247,4 +247,4 @@ Add CA cluster issuer to your kubernetes cluster - preferably yaml
   ```
   kubectl apply -f deploy.yaml
   ```
-
+# Add your applications routing to your Ingress proxy
