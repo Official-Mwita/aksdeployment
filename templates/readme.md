@@ -187,8 +187,58 @@ ingress-nginx-controller   LoadBalancer   10.0.65.205   EXTERNAL-IP     80:30957
    - For Azure FQDN - browse to IP address resource, add it's FQDN
    - If using an external domain (custom domain). Browse to your domain DNS admin portal, then add you preferred DNS record e.g CNAME, AAAA, etc
 
-# Try to access your server from the internet to confirm that it's working - either by IP address or domain. You should get a 404 Nginx default response
+**Try to access your server from the internet to confirm that it's working - either by IP address or domain. You should get a 404 Nginx default response**
 
+## Setting up TSL (SSL encryption) - using Let's Encrypt
+- Installing a [Cert-Manager](https://github.com/cert-manager/cert-manager)
+  [Cert-Manager](https://github.com/cert-manager/cert-manager) is an open-source SSL configuration bot provided under [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0) used to automate Kubernetes cluster's SSL certificates acquisition
+     - Label the ingress-basic namespace to disable resource validation
+       ```
+       kubectl label namespace ingress-basic cert-manager.io/disable-validation=true
+       ```
+     - Add the Jetstack Helm repository
+       ```
+       helm repo add jetstack https://charts.jetstack.io
+       ```
+     - Update your local Helm chart repository cache
+       ```
+       helm repo update
+       ```
+- Add cert-manager images to your ACR
+   ```
+   REGISTRY_NAME=$acr
+   CERT_MANAGER_REGISTRY=quay.io
+   CERT_MANAGER_TAG=v1.8.0
+   CERT_MANAGER_IMAGE_CONTROLLER=jetstack/cert-manager-controller
+   CERT_MANAGER_IMAGE_WEBHOOK=jetstack/cert-manager-webhook
+   CERT_MANAGER_IMAGE_CAINJECTOR=jetstack/cert-manager-cainjector
+   ```
+   ```
+   az acr import --name $REGISTRY_NAME --source $CERT_MANAGER_REGISTRY/$CERT_MANAGER_IMAGE_CONTROLLER:$CERT_MANAGER_TAG --image $CERT_MANAGER_IMAGE_CONTROLLER:$CERT_MANAGER_TAG
+   ```
+   ```
+   az acr import --name $REGISTRY_NAME --source $CERT_MANAGER_REGISTRY/$CERT_MANAGER_IMAGE_WEBHOOK:$CERT_MANAGER_TAG --image $CERT_MANAGER_IMAGE_WEBHOOK:$CERT_MANAGER_TAG
+   ```
+   ```
+   az acr import --name $REGISTRY_NAME --source $CERT_MANAGER_REGISTRY/$CERT_MANAGER_IMAGE_CAINJECTOR:$CERT_MANAGER_TAG --image $CERT_MANAGER_IMAGE_CAINJECTOR:$CERT_MANAGER_TAG
+   ```
+- Install the cert-manager Helm chart
+  ```
+  helm install cert-manager jetstack/cert-manager \
+  --namespace <namespace> \
+  --version=$CERT_MANAGER_TAG \
+  --set installCRDs=true \
+  --set nodeSelector."kubernetes\.io/os"=linux \
+  --set image.repository=$ACR_URL/$CERT_MANAGER_IMAGE_CONTROLLER \
+  --set image.tag=$CERT_MANAGER_TAG \
+  --set webhook.image.repository=$ACR_URL/$CERT_MANAGER_IMAGE_WEBHOOK \
+  --set webhook.image.tag=$CERT_MANAGER_TAG \
+  --set cainjector.image.repository=$ACR_URL/$CERT_MANAGER_IMAGE_CAINJECTOR \
+  --set cainjector.image.tag=$CERT_MANAGER_TAG
+  ```
+
+## Create a CA cluster issuer
+Add CA cluster issuer to your kubernetes cluster - preferably yaml
 
 ## Deploy Images to AKS
 
@@ -198,9 +248,3 @@ ingress-nginx-controller   LoadBalancer   10.0.65.205   EXTERNAL-IP     80:30957
   kubectl apply -f deploy.yaml
   ```
 
-## Route Using YAML
-
-In this section, use paths...
-```
-
-Please note that in Markdown, you need to properly format code blocks by using triple backticks (```) before and after the code. Also, ensure that you maintain the appropriate indentation within the code blocks to preserve the formatting.
